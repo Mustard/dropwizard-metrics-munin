@@ -1,7 +1,7 @@
 package com.github.mustard.metrics.munin;
 
+import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.health.HealthCheck;
-import com.codahale.metrics.health.HealthCheckRegistry;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -11,19 +11,20 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 
-public class MuninHealthCheckServlet extends HttpServlet {
+public class MuninMetricsServlet extends HttpServlet {
 
-    private final transient HealthCheckRegistry registry;
+    private final transient MetricRegistry registry;
     private final transient ExecutorService executorService;
 
-    public MuninHealthCheckServlet(HealthCheckRegistry registry) {
+    public MuninMetricsServlet(MetricRegistry registry) {
         this.registry = registry;
         this.executorService = null;
     }
 
-    public MuninHealthCheckServlet(HealthCheckRegistry registry, ExecutorService executorService) {
+    public MuninMetricsServlet(MetricRegistry registry, ExecutorService executorService) {
         this.registry = registry;
         this.executorService = executorService;
     }
@@ -41,7 +42,7 @@ public class MuninHealthCheckServlet extends HttpServlet {
             if (req.getParameter("config") != null) {
                 writeConfigBody(resp.getWriter(), registry);
             } else {
-                writeFetchBody(resp.getWriter(), runHealthChecks());
+                writeFetchBody(resp.getWriter(), run());
             }
         }
 
@@ -49,36 +50,30 @@ public class MuninHealthCheckServlet extends HttpServlet {
 
     private void writeFetchBody(PrintWriter writer, SortedMap<String, HealthCheck.Result> results) {
         for (Map.Entry<String, HealthCheck.Result> check : results.entrySet()) {
-            char result = check.getValue().isHealthy() ? '1' : '0';
-            writer.println(sanitiseCheckKey(check.getKey()) + ".value " + result);
+            String sanitisedCheckName = sanitiseCheckName(check.getKey());
+            writer.println(sanitisedCheckName + ".value " + check.getValue().isHealthy());
         }
     }
 
-    private void writeConfigBody(PrintWriter writer, HealthCheckRegistry registry) {
-        writer.println("graph_title Health Checks");
+    private void writeConfigBody(PrintWriter writer, MetricRegistry registry) {
+        writer.println("graph_title Metrics");
         writer.println("graph_vlabel Success");
-        writer.println("graph_category health");
-        writer.println("graph_info Application Health Checks");
         for (String checkName : registry.getNames()) {
-            writer.println(sanitiseCheckKey(checkName) + ".label " + sanitiseCheckName(checkName));
-            writer.println(sanitiseCheckKey(checkName) + ".critical 0");
-            writer.println(sanitiseCheckKey(checkName) + ".draw AREASTACK");
+            String sanitisedCheckName = sanitiseCheckName(checkName);
+            writer.println(sanitisedCheckName + ".label " + sanitisedCheckName);
         }
     }
 
-    private SortedMap<String, HealthCheck.Result> runHealthChecks() {
-        if (executorService == null) {
-            return registry.runHealthChecks();
-        }
-        return registry.runHealthChecks(executorService);
+    private SortedMap<String, HealthCheck.Result> run() {
+        return new TreeMap<>();
+//        if (executorService == null) {
+//            return registry.runHealthChecks();
+//        }
+//        return registry.runHealthChecks(executorService);
     }
 
     private String sanitiseCheckName(String checkName) {
         return checkName.replaceAll(" ", "_");
-    }
-
-    private String sanitiseCheckKey(String checkKey) {
-        return checkKey.replaceAll(" ", "_").toLowerCase();
     }
 
 }
