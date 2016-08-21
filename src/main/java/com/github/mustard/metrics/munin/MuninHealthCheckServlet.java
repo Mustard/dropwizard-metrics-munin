@@ -61,7 +61,7 @@ public class MuninHealthCheckServlet extends HttpServlet {
         writer.println("graph_info Application Health Checks");
         for (String checkName : registry.getNames()) {
             writer.println(sanitiseCheckKey(checkName) + ".label " + sanitiseCheckName(checkName));
-            writer.println(sanitiseCheckKey(checkName) + ".critical 0");
+            writer.println(sanitiseCheckKey(checkName) + ".critical 1:1");
             writer.println(sanitiseCheckKey(checkName) + ".draw AREASTACK");
         }
     }

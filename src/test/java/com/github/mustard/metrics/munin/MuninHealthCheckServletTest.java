@@ -53,13 +53,13 @@ public class MuninHealthCheckServletTest {
                 .containsOnly(
                         "deadlocks.label deadlocks",
                         "deadlocks.draw AREASTACK",
-                        "deadlocks.critical 0",
+                        "deadlocks.critical 1:1",
                         "db.label DB",
                         "db.draw AREASTACK",
-                        "db.critical 0",
+                        "db.critical 1:1",
                         "flux_capacitor.label Flux_Capacitor",
                         "flux_capacitor.draw AREASTACK",
-                        "flux_capacitor.critical 0"
+                        "flux_capacitor.critical 1:1"
                 );
     }
 
