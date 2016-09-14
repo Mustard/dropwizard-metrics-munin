@@ -48,8 +48,10 @@ public class MuninHealthCheckServletTest {
         assertThat(actualLines.get(1)).isEqualTo("graph_vlabel Success");
         assertThat(actualLines.get(2)).isEqualTo("graph_category health");
         assertThat(actualLines.get(3)).isEqualTo("graph_info Application Health Checks");
+        assertThat(actualLines.get(4)).isEqualTo("graph_scale no");
+        assertThat(actualLines.get(5)).isEqualTo("graph_args -X 0");
 
-        assertThat(actualLines.subList(4, actualLines.size()))
+        assertThat(actualLines.subList(6, actualLines.size()))
                 .containsOnly(
                         "deadlocks.label deadlocks",
                         "deadlocks.draw AREASTACK",

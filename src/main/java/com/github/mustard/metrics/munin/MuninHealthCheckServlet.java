@@ -59,6 +59,8 @@ public class MuninHealthCheckServlet extends HttpServlet {
         writer.println("graph_vlabel Success");
         writer.println("graph_category health");
         writer.println("graph_info Application Health Checks");
+        writer.println("graph_scale no");
+        writer.println("graph_args -X 0");
         for (String checkName : registry.getNames()) {
             writer.println(sanitiseCheckKey(checkName) + ".label " + sanitiseCheckName(checkName));
             writer.println(sanitiseCheckKey(checkName) + ".critical 1:1");
@@ -73,6 +75,7 @@ public class MuninHealthCheckServlet extends HttpServlet {
         return registry.runHealthChecks(executorService);
     }
 
+    // TODO DRY UP
     private String sanitiseCheckName(String checkName) {
         return checkName.replaceAll(" ", "_");
     }
