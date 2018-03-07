@@ -30,8 +30,7 @@ public class MuninMetricsServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req,
-                         HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         resp.setContentType("text/plain");
         resp.setHeader("Cache-Control", "must-revalidate,no-cache,no-store");
@@ -50,7 +49,7 @@ public class MuninMetricsServlet extends HttpServlet {
 
     private void writeFetchBody(PrintWriter writer, SortedMap<String, HealthCheck.Result> results) {
         for (Map.Entry<String, HealthCheck.Result> check : results.entrySet()) {
-            String sanitisedCheckName = sanitiseCheckName(check.getKey());
+            String sanitisedCheckName = MuninMetricsUtil.sanitiseCheckName(check.getKey());
             writer.println(sanitisedCheckName + ".value " + check.getValue().isHealthy());
         }
     }
@@ -59,7 +58,7 @@ public class MuninMetricsServlet extends HttpServlet {
         writer.println("graph_title Metrics");
         writer.println("graph_vlabel Success");
         for (String checkName : registry.getNames()) {
-            String sanitisedCheckName = sanitiseCheckName(checkName);
+            String sanitisedCheckName = MuninMetricsUtil.sanitiseCheckName(checkName);
             writer.println(sanitisedCheckName + ".label " + sanitisedCheckName);
         }
     }
@@ -70,10 +69,6 @@ public class MuninMetricsServlet extends HttpServlet {
 //            return registry.runHealthChecks();
 //        }
 //        return registry.runHealthChecks(executorService);
-    }
-
-    private String sanitiseCheckName(String checkName) {
-        return checkName.replaceAll(" ", "_");
     }
 
 }
