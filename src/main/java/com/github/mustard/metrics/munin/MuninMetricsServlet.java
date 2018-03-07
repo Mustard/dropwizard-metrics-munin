@@ -1,5 +1,6 @@
 package com.github.mustard.metrics.munin;
 
+import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.health.HealthCheck;
 
@@ -56,11 +57,18 @@ public class MuninMetricsServlet extends HttpServlet {
 
     private void writeConfigBody(PrintWriter writer, MetricRegistry registry) {
         writer.println("graph_title Metrics");
-        writer.println("graph_vlabel Success");
-        for (String checkName : registry.getNames()) {
-            String sanitisedCheckName = MuninMetricsUtil.sanitiseCheckName(checkName);
-            writer.println(sanitisedCheckName + ".label " + sanitisedCheckName);
+        writer.println("graph_category metrics");
+        writer.println("graph_info Application Metrics");
+
+        SortedMap<String, Gauge> gauges = registry.getGauges();
+        for (Map.Entry<String, Gauge> stringGaugeEntry : gauges.entrySet()) {
+            writer.println(MuninMetricsUtil.sanitiseCheckKey(stringGaugeEntry.getKey()));
         }
+//        gauges.
+//        for (String checkName : registry.getNames()) {
+//            String sanitisedCheckName = MuninMetricsUtil.sanitiseCheckName(checkName);
+//            writer.println(sanitisedCheckName + ".label " + sanitisedCheckName);
+//        }
     }
 
     private SortedMap<String, HealthCheck.Result> run() {
