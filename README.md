@@ -21,18 +21,32 @@ public void run(AppConfig config, Environment env) throws Exception {
 
 Now making a request to `/munin-healthcheck?config` will return the munin node configuration and `/munin-healthcheck` will return the health check data
 
-We can create a simple munin-node plugin for *nix systems with 
+We can create a simple munin-node plugin for *nix systems with the following script
 
 ```bash
+#!/bin/bash
 
+URL='http://localhost:8081/munin-healthcheck'
+
+case "$1" in
+    suggest)
+        // TODO auto configuring with suggest
+        ;;
+    config)
+        curl "$URL?config"
+        ;;
+    *)
+        curl "$URL"
+        ;;
+esac
 ```
 
+Copy this script to your munin plugin directory something like `/opt/munin/plugins/api-health` or `/usr/share/munin/plugins/api-health`
 
-## Health
+Make it executable and enable it
 
-`MuninHealthCheck`
-
-## Metrics
-
-The `MuninMetricsServlet` 
+```bash
+chmod +x /opt/munin/plugins/api-health
+ln -s '/usr/share/munin/plugins/api-health' '/etc/munin/plugins/api-health'
+```
 
