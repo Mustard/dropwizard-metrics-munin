@@ -43,10 +43,11 @@ esac
 
 Copy this script to your munin plugin directory something like `/opt/munin/plugins/api-health` or `/usr/share/munin/plugins/api-health`
 
-Make it executable and enable it
+Make it executable and enable it and restart the munin-node
 
 ```bash
 chmod +x /opt/munin/plugins/api-health
 ln -s '/usr/share/munin/plugins/api-health' '/etc/munin/plugins/api-health'
+/etc/init.d/munin-node restart
 ```
 
