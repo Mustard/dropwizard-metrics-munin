@@ -29,8 +29,7 @@ public class MuninHealthCheckServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req,
-                         HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         resp.setContentType("text/plain");
         resp.setHeader("Cache-Control", "must-revalidate,no-cache,no-store");
@@ -50,7 +49,7 @@ public class MuninHealthCheckServlet extends HttpServlet {
     private void writeFetchBody(PrintWriter writer, SortedMap<String, HealthCheck.Result> results) {
         for (Map.Entry<String, HealthCheck.Result> check : results.entrySet()) {
             char result = check.getValue().isHealthy() ? '1' : '0';
-            writer.println(sanitiseCheckKey(check.getKey()) + ".value " + result);
+            writer.println(MuninMetricsUtil.sanitiseCheckKey(check.getKey()) + ".value " + result);
         }
     }
 
@@ -62,26 +61,16 @@ public class MuninHealthCheckServlet extends HttpServlet {
         writer.println("graph_scale no");
         writer.println("graph_args -X 0");
         for (String checkName : registry.getNames()) {
-            writer.println(sanitiseCheckKey(checkName) + ".label " + sanitiseCheckName(checkName));
-            writer.println(sanitiseCheckKey(checkName) + ".critical 1:1");
-            writer.println(sanitiseCheckKey(checkName) + ".draw AREASTACK");
+            writer.println(MuninMetricsUtil.sanitiseCheckKey(checkName) + ".label " + MuninMetricsUtil.sanitiseCheckName(checkName));
+            writer.println(MuninMetricsUtil.sanitiseCheckKey(checkName) + ".critical 1:1");
+            writer.println(MuninMetricsUtil.sanitiseCheckKey(checkName) + ".draw AREASTACK");
         }
     }
 
     private SortedMap<String, HealthCheck.Result> runHealthChecks() {
-        if (executorService == null) {
-            return registry.runHealthChecks();
-        }
-        return registry.runHealthChecks(executorService);
-    }
-
-    // TODO DRY UP
-    private String sanitiseCheckName(String checkName) {
-        return checkName.replaceAll(" ", "_");
-    }
-
-    private String sanitiseCheckKey(String checkKey) {
-        return checkKey.replaceAll(" ", "_").toLowerCase();
+        return (executorService == null)
+                ? registry.runHealthChecks()
+                : registry.runHealthChecks(executorService);
     }
 
 }
