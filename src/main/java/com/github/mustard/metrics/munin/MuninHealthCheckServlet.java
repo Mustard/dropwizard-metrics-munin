@@ -13,6 +13,9 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.concurrent.ExecutorService;
 
+import static com.github.mustard.metrics.munin.MuninMetricsUtil.sanitiseKey;
+import static com.github.mustard.metrics.munin.MuninMetricsUtil.sanitiseName;
+
 public class MuninHealthCheckServlet extends HttpServlet {
 
     private final transient HealthCheckRegistry registry;
@@ -49,7 +52,7 @@ public class MuninHealthCheckServlet extends HttpServlet {
     private void writeFetchBody(PrintWriter writer, SortedMap<String, HealthCheck.Result> results) {
         for (Map.Entry<String, HealthCheck.Result> check : results.entrySet()) {
             char result = check.getValue().isHealthy() ? '1' : '0';
-            writer.println(MuninMetricsUtil.sanitiseCheckKey(check.getKey()) + ".value " + result);
+            writer.println(sanitiseKey(check.getKey()) + ".value " + result);
         }
     }
 
@@ -61,9 +64,9 @@ public class MuninHealthCheckServlet extends HttpServlet {
         writer.println("graph_scale no");
         writer.println("graph_args -X 0");
         for (String checkName : registry.getNames()) {
-            writer.println(MuninMetricsUtil.sanitiseCheckKey(checkName) + ".label " + MuninMetricsUtil.sanitiseCheckName(checkName));
-            writer.println(MuninMetricsUtil.sanitiseCheckKey(checkName) + ".critical 1:1");
-            writer.println(MuninMetricsUtil.sanitiseCheckKey(checkName) + ".draw AREASTACK");
+            writer.println(sanitiseKey(checkName) + ".label " + sanitiseName(checkName));
+            writer.println(sanitiseKey(checkName) + ".critical 1:1");
+            writer.println(sanitiseKey(checkName) + ".draw AREASTACK");
         }
     }
 

@@ -50,7 +50,7 @@ public class MuninMetricsServlet extends HttpServlet {
 
     private void writeFetchBody(PrintWriter writer, SortedMap<String, HealthCheck.Result> results) {
         for (Map.Entry<String, HealthCheck.Result> check : results.entrySet()) {
-            String sanitisedCheckName = MuninMetricsUtil.sanitiseCheckName(check.getKey());
+            String sanitisedCheckName = MuninMetricsUtil.sanitiseName(check.getKey());
             writer.println(sanitisedCheckName + ".value " + check.getValue().isHealthy());
         }
     }
@@ -62,7 +62,7 @@ public class MuninMetricsServlet extends HttpServlet {
 
         SortedMap<String, Gauge> gauges = registry.getGauges();
         for (Map.Entry<String, Gauge> stringGaugeEntry : gauges.entrySet()) {
-            writer.println(MuninMetricsUtil.sanitiseCheckKey(stringGaugeEntry.getKey()));
+            writer.println(MuninMetricsUtil.sanitiseKey(stringGaugeEntry.getKey()));
         }
 //        gauges.
 //        for (String checkName : registry.getNames()) {
